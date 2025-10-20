@@ -1,0 +1,8 @@
+.landing-page { min-height: 100vh; background:#0f2a38; display:flex; align-items:center; justify-content:center; }
+.landing-center { text-align:center; }
+.landing-title { color:#0ec0d4; font-weight:800; font-size:72px; letter-spacing:1px; margin-top:-20px; margin-bottom:20px; }
+.landing-actions { display:flex; flex-direction:column; gap:12px; align-items:center; }
+.landing-btn { display:inline-block; min-width:240px; background:#e9ecef; color:#184354; font-weight:700; padding:10px 20px; border-radius:8px; text-decoration:none; box-shadow:0 10px 18px rgba(0,0,0,0.2); }
+.landing-btn:hover { filter:brightness(0.97); }
+
+

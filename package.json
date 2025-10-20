@@ -1,0 +1,42 @@
+{
+  "name": "classroom-utilization-mern",
+  "version": "1.0.0",
+  "description": "Classroom Utilization System using MERN Stack",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "server": "nodemon server.js",
+    "client": "npm start --prefix client",
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "build": "npm run build --prefix client",
+    "build:server": "npm run build && npm start",
+    "init-admin": "node scripts/initAdmin.js",
+    "heroku-postbuild": "NPM_CONFIG_PRODUCTION=false npm install --prefix client && npm run build --prefix client"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "express-validator": "^7.0.1",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^7.5.0",
+    "multer": "^2.0.2"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.0",
+    "nodemon": "^3.0.1"
+  },
+  "keywords": [
+    "mern",
+    "classroom",
+    "utilization",
+    "mongodb",
+    "express",
+    "react",
+    "node"
+  ],
+  "author": "Your Name",
+  "license": "MIT"
+}
