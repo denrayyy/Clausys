@@ -11,6 +11,7 @@ import scheduleRoutes from "./routes/schedules.js";
 import usageRoutes from "./routes/usage.js";
 import reportRoutes from "./routes/reports.js";
 import timeInRoutes from "./routes/timein.js";
+import userRoutes from "./routes/users.js";
 import seedAdminIfMissing from "./utils/seedAdmin.js";
 
 // Load environment variables
@@ -48,6 +49,7 @@ app.use("/api/schedules", scheduleRoutes);
 app.use("/api/usage", usageRoutes);
 app.use("/api/reports", reportRoutes);
 app.use("/api/timein", timeInRoutes);
+app.use("/api/users", userRoutes);
 
 // API routes
 app.get("/api", (req, res) => {
@@ -62,6 +64,7 @@ app.get("/api", (req, res) => {
       usage: "/api/usage",
       reports: "/api/reports",
       timein: "/api/timein",
+      users: "/api/users",
     },
   });
 });
