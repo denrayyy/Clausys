@@ -11,6 +11,8 @@ import scheduleRoutes from "./routes/schedules.js";
 import usageRoutes from "./routes/usage.js";
 import reportRoutes from "./routes/reports.js";
 import timeInRoutes from "./routes/timein.js";
+import userRoutes from "./routes/users.js";
+import apiRoutes from "./server/routes/api.js";
 import seedAdminIfMissing from "./utils/seedAdmin.js";
 
 // Load environment variables
@@ -31,6 +33,9 @@ app.use(cors());
 app.use(express.json()); 
 app.use(express.static("public"));
 
+// Serve uploaded files (profile photos, evidence photos)
+app.use('/uploads', express.static(path.join(__dirname, "uploads")));
+
 // Serve static files from the React app build directory
 app.use(express.static(path.join(__dirname, "client/build")));
 
@@ -48,6 +53,9 @@ app.use("/api/schedules", scheduleRoutes);
 app.use("/api/usage", usageRoutes);
 app.use("/api/reports", reportRoutes);
 app.use("/api/timein", timeInRoutes);
+app.use("/api/users", userRoutes);
+// Example public endpoints (attendance log and classroom status)
+app.use("/api", apiRoutes);
 
 // API routes
 app.get("/api", (req, res) => {
@@ -62,6 +70,7 @@ app.get("/api", (req, res) => {
       usage: "/api/usage",
       reports: "/api/reports",
       timein: "/api/timein",
+      users: "/api/users",
     },
   });
 });

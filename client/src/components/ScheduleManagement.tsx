@@ -7,7 +7,7 @@ interface User {
   firstName: string;
   lastName: string;
   email: string;
-  role: 'teacher' | 'admin';
+  role: 'student' | 'admin' | 'teacher'; // 'teacher' kept for backward compatibility
   employeeId: string;
   department: string;
 }
@@ -21,7 +21,7 @@ interface Classroom {
 
 interface Schedule {
   _id: string;
-  teacher: {
+  student: {
     _id: string;
     firstName: string;
     lastName: string;
@@ -184,7 +184,7 @@ const ScheduleManagement: React.FC<ScheduleManagementProps> = ({ user }) => {
 
   const filteredSchedules = schedules.filter(schedule => {
     if (filter === 'all') return true;
-    if (filter === 'my') return schedule.teacher._id === user.id;
+    if (filter === 'my') return schedule.student._id === user.id;
     return schedule.status === filter;
   });
 
@@ -200,8 +200,6 @@ const ScheduleManagement: React.FC<ScheduleManagementProps> = ({ user }) => {
   return (
     <div className="schedule-management">
       <div className="page-header">
-        <h1>Schedule Management</h1>
-        <p>Manage class schedules and requests</p>
       </div>
 
       {error && <div className="error-message">{error}</div>}
@@ -393,7 +391,7 @@ const ScheduleManagement: React.FC<ScheduleManagementProps> = ({ user }) => {
                         </button>
                       </>
                     )}
-                    {(schedule.teacher._id === user.id || user.role === 'admin') && (
+                    {(schedule.student._id === user.id || user.role === 'admin') && (
                       <button
                         className="btn btn-danger"
                         onClick={() => handleDelete(schedule._id)}
@@ -421,8 +419,8 @@ const ScheduleManagement: React.FC<ScheduleManagementProps> = ({ user }) => {
                       <span className="detail-value">{schedule.startTime} - {schedule.endTime}</span>
                     </div>
                     <div className="detail-item">
-                      <span className="detail-label">Teacher:</span>
-                      <span className="detail-value">{schedule.teacher.firstName} {schedule.teacher.lastName}</span>
+                      <span className="detail-label">Student:</span>
+                      <span className="detail-value">{schedule.student.firstName} {schedule.student.lastName}</span>
                     </div>
                   </div>
                   <div className="detail-row">

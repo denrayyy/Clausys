@@ -7,7 +7,7 @@ interface User {
   firstName: string;
   lastName: string;
   email: string;
-  role: 'teacher' | 'admin';
+  role: 'student' | 'admin' | 'teacher'; // 'teacher' kept for backward compatibility
   employeeId: string;
   department: string;
 }

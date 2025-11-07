@@ -26,8 +26,8 @@ const userSchema = mongoose.Schema({
   },
   role: {
     type: String,
-    enum: ["teacher", "admin"],
-    default: "teacher"
+    enum: ["student", "admin", "teacher"], // "teacher" kept for backward compatibility during migration
+    default: "student"
   },
   employeeId: {
     type: String,
@@ -41,12 +41,27 @@ const userSchema = mongoose.Schema({
   phone: {
     type: String
   },
+  profilePhoto: {
+    type: String
+  },
   isActive: {
     type: Boolean,
     default: true
   },
   lastLogin: {
     type: Date
+  }
+  ,
+  // Password reset support
+  passwordResetToken: {
+    type: String
+  },
+  passwordResetExpires: {
+    type: Date
+  },
+  // Optional Google account linkage (for OAuth sign-in)
+  googleId: {
+    type: String
   }
 }, {
   timestamps: true

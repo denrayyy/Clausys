@@ -34,9 +34,13 @@ export const requireAdmin = (req, res, next) => {
   next();
 };
 
-export const requireTeacher = (req, res, next) => {
-  if (req.user.role !== "teacher" && req.user.role !== "admin") {
-    return res.status(403).json({ message: "Teacher access required" });
+export const requireStudent = (req, res, next) => {
+  // Allow student, teacher (for backward compatibility), and admin
+  if (req.user.role !== "student" && req.user.role !== "admin" && req.user.role !== "teacher") {
+    return res.status(403).json({ message: "Student access required" });
   }
   next();
 };
+
+// Legacy alias for backward compatibility
+export const requireTeacher = requireStudent;

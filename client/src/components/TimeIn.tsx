@@ -17,11 +17,16 @@ const TimeIn: React.FC<TimeInProps> = ({ user, onBack }) => {
   const [classrooms, setClassrooms] = useState<Classroom[]>([]);
   const [selectedClassroom, setSelectedClassroom] = useState('');
   const [evidence, setEvidence] = useState<File | null>(null);
+  const [instructorName, setInstructorName] = useState('');
   const [remarks, setRemarks] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
   const [timeInData, setTimeInData] = useState<any>(null);
+  const [timeOutSuccess, setTimeOutSuccess] = useState(false);
+  const [timeOutTime, setTimeOutTime] = useState('');
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+  const [showLogoutSuccess, setShowLogoutSuccess] = useState(false);
 
   // Get current date and time
   const currentDate = new Date();
@@ -38,6 +43,7 @@ const TimeIn: React.FC<TimeInProps> = ({ user, onBack }) => {
 
   useEffect(() => {
     fetchClassrooms();
+    checkActiveTimeIn();
   }, []);
 
   const fetchClassrooms = async () => {
@@ -55,6 +61,30 @@ const TimeIn: React.FC<TimeInProps> = ({ user, onBack }) => {
       }
     } catch (error) {
       console.error('Error fetching classrooms:', error);
+    }
+  };
+
+  const checkActiveTimeIn = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch('/api/timein', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        // Find active time-in (one without timeOut)
+        const activeTimeIn = data.find((record: any) => !record.timeOut);
+        
+        if (activeTimeIn) {
+          setTimeInData(activeTimeIn);
+          setSuccess(true);
+        }
+      }
+    } catch (error) {
+      console.error('Error checking active time-in:', error);
     }
   };
 
@@ -76,11 +106,67 @@ const TimeIn: React.FC<TimeInProps> = ({ user, onBack }) => {
     }
   };
 
+  const handleTimeOut = async () => {
+    setLoading(true);
+    setError('');
+    
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch('/api/timein/timeout', {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        const timeOutDate = new Date(data.timeInRecord.timeOut);
+        const formattedTime = timeOutDate.toLocaleTimeString('en-US', {
+          hour: '2-digit',
+          minute: '2-digit',
+          hour12: true
+        });
+        setTimeOutTime(formattedTime);
+        setTimeOutSuccess(true);
+        setSuccess(false); // Clear the success state
+      } else {
+        setError(data.message || 'Time-out failed');
+      }
+    } catch (error) {
+      console.error('Time-out error:', error);
+      setError('Network error. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleLogoutClick = () => {
+    setShowLogoutConfirm(true);
+  };
+
+  const handleLogoutConfirm = () => {
+    setShowLogoutConfirm(false);
+    setShowLogoutSuccess(true);
+  };
+
+  const handleLogoutCancel = () => {
+    setShowLogoutConfirm(false);
+  };
+
+  const handleLoginAgain = () => {
+    // Clear token and redirect to landing page
+    localStorage.removeItem('token');
+    window.location.href = '/';
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!selectedClassroom || !evidence) {
-      setError('Please select a classroom and upload evidence');
+    if (!selectedClassroom || !evidence || !instructorName.trim()) {
+      setError('Please select a classroom, upload evidence, and enter instructor name');
       return;
     }
 
@@ -92,6 +178,7 @@ const TimeIn: React.FC<TimeInProps> = ({ user, onBack }) => {
       const formData = new FormData();
       formData.append('classroom', selectedClassroom);
       formData.append('evidence', evidence);
+      formData.append('instructorName', instructorName);
       if (remarks) formData.append('remarks', remarks);
 
       console.log('Sending time-in request...', { selectedClassroom, evidence: evidence?.name, remarks });
@@ -114,15 +201,11 @@ const TimeIn: React.FC<TimeInProps> = ({ user, onBack }) => {
         // Reset form
         setSelectedClassroom('');
         setEvidence(null);
+        setInstructorName('');
         setRemarks('');
         // Reset file input
         const fileInput = document.getElementById('evidence') as HTMLInputElement;
         if (fileInput) fileInput.value = '';
-        
-        // Auto-redirect to TimeTracker after 2 seconds
-        setTimeout(() => {
-          onBack();
-        }, 2000);
       } else {
         setError(data.message || 'Time-in failed');
       }
@@ -138,18 +221,88 @@ const TimeIn: React.FC<TimeInProps> = ({ user, onBack }) => {
     }
   };
 
-  if (success) {
+  // Show logout success screen
+  if (showLogoutSuccess) {
     return (
-      <div className="timein-page">
-        <div className="timein-container">
-          <div className="success-message">
-            <div className="success-icon">✓</div>
-            <h2>Timed in at {formattedTime}</h2>
-            <p>Your time-in has been recorded with evidence.</p>
-            <p className="redirect-message">Redirecting to dashboard...</p>
-            <button className="btn-primary" onClick={onBack}>
-              Back to Dashboard
+      <div className="logout-page">
+        <div className="logout-container">
+          <div className="logout-content">
+            <div className="logout-logo">
+              <svg viewBox="0 0 64 64" width="80" height="80" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M24 56h16" stroke="#11303b" strokeWidth="4" strokeLinecap="round"/>
+                <path d="M32 8c-9.389 0-17 7.611-17 17 0 6.06 3.087 11.382 7.78 14.5 1.689 1.114 2.22 2.654 2.22 4.5v2h16v-2c0-1.846.531-3.386 2.22-4.5C45.913 36.382 49 31.06 49 25c0-9.389-7.611-17-17-17Z" stroke="#11303b" strokeWidth="3"/>
+                <path d="M26 42h12" stroke="#11303b" strokeWidth="3" strokeLinecap="round"/>
+              </svg>
+            </div>
+            <h1 className="logout-title">ClaUSys</h1>
+            <p className="logout-subtitle">Classroom Utilization System</p>
+            <p className="logout-message">Successfully Logged Out!</p>
+            <button className="btn-login-again" onClick={handleLoginAgain}>
+              Login Again
             </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Show time-out success screen
+  if (timeOutSuccess) {
+    return (
+      <div className="status-page">
+        <div className="status-box">
+          <div className="status-content">
+            <div className="status-icon">⏰</div>
+            <h2 className="status-title">Timed out at {timeOutTime}</h2>
+            <p className="status-message">Your time-out has been recorded successfully.</p>
+            <button className="btn-logout-blue" onClick={handleLogoutClick}>
+              Logout
+            </button>
+          </div>
+        </div>
+        {showLogoutConfirm && (
+          <div className="modal-overlay">
+            <div className="logout-confirm-modal">
+              <p className="logout-confirm-text">Are you sure you want to <strong>log-out</strong>?</p>
+              <div className="logout-confirm-buttons">
+                <button className="btn-confirm-yes" onClick={handleLogoutConfirm}>Yes</button>
+                <button className="btn-confirm-no" onClick={handleLogoutCancel}>No</button>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  // Show time-in success screen with Time Out button
+  if (success) {
+    // Get the time-in time from the record if available, otherwise use current time
+    let displayTime = formattedTime;
+    if (timeInData && timeInData.timeIn) {
+      const timeInDate = new Date(timeInData.timeIn);
+      displayTime = timeInDate.toLocaleTimeString('en-US', {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false
+      });
+    }
+
+    return (
+      <div className="status-page">
+        <div className="status-box">
+          <div className="status-content">
+            <div className="status-icon-check">✓</div>
+            <h2 className="status-title">Timed in at {displayTime}</h2>
+            <p className="status-message">Your time-in has been recorded with evidence.</p>
+            <button 
+              className="btn-timeout-red" 
+              onClick={handleTimeOut}
+              disabled={loading}
+            >
+              {loading ? 'Processing...' : 'Time Out'}
+            </button>
+            {error && <div className="error-message" style={{marginTop: '20px'}}>{error}</div>}
           </div>
         </div>
       </div>
@@ -244,10 +397,22 @@ const TimeIn: React.FC<TimeInProps> = ({ user, onBack }) => {
                   <option value="">Select Classroom</option>
                   {classrooms.map((classroom) => (
                     <option key={classroom._id} value={classroom._id}>
-                      {classroom.name} - {classroom.location}
+                      {classroom.name}
                     </option>
                   ))}
                 </select>
+              </div>
+
+              <div className="field-group">
+                <label>Instructor Name:</label>
+                <input
+                  type="text"
+                  value={instructorName}
+                  onChange={(e) => setInstructorName(e.target.value)}
+                  placeholder="Enter instructor's name"
+                  required
+                  className="form-field"
+                />
               </div>
 
               <div className="field-group">

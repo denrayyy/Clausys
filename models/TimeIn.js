@@ -3,19 +3,19 @@ import mongoose from "mongoose";
 /**
  * TimeIn Schema
  * 
- * This model stores teacher time-in records with evidence uploads.
- * It's designed to track teacher attendance with photographic proof
+ * This model stores student time-in records with evidence uploads.
+ * It's designed to track student attendance with photographic proof
  * and includes verification workflow for administrators.
  * 
  * Key Features:
  * - Evidence upload with file metadata storage
  * - Automatic timestamp capture (timeIn, date)
  * - Verification workflow (pending -> verified/rejected)
- * - Teacher and classroom references
+ * - Student and classroom references
  * - Admin verification tracking
  */
 const timeInSchema = mongoose.Schema({
-  teacher: {
+  student: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
     required: true
@@ -52,10 +52,17 @@ const timeInSchema = mongoose.Schema({
     required: true,
     default: Date.now
   },
+  timeOut: {
+    type: Date
+  },
   date: {
     type: Date,
     required: true,
     default: Date.now
+  },
+  instructorName: {
+    type: String,
+    required: true
   },
   status: {
     type: String,
@@ -71,13 +78,17 @@ const timeInSchema = mongoose.Schema({
   },
   verifiedAt: {
     type: Date
+  },
+  isArchived: {
+    type: Boolean,
+    default: false
   }
 }, {
   timestamps: true
 });
 
 // Index for efficient queries
-timeInSchema.index({ teacher: 1, date: -1 });
+timeInSchema.index({ student: 1, date: -1 });
 timeInSchema.index({ classroom: 1, date: -1 });
 timeInSchema.index({ status: 1 });
 

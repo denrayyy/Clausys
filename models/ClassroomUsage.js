@@ -6,7 +6,7 @@ const classroomUsageSchema = mongoose.Schema({
     ref: "Classroom",
     required: true
   },
-  teacher: {
+  student: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
     required: true

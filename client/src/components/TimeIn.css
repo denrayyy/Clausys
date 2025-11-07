@@ -185,6 +185,12 @@ textarea.form-field {
   font-weight: bold;
 }
 
+.success-icon-timeout {
+  font-size: 96px;
+  margin-bottom: 24px;
+  animation: pulse 1.5s ease-in-out;
+}
+
 .success-message h2 {
   color: white;
   margin-bottom: 16px;
@@ -202,6 +208,181 @@ textarea.form-field {
   color: #9ca3af !important;
   font-size: 14px !important;
   font-style: italic;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+/* Status Pages (Time In/Out Success) */
+.status-page {
+  min-height: 100vh;
+  background: #1a5f6f;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.status-box {
+  background: white;
+  border-radius: 16px;
+  padding: 30px;
+  max-width: 700px;
+  width: 100%;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.status-content {
+  background: #2e4482;
+  border-radius: 12px;
+  padding: 60px 40px;
+  text-align: center;
+  color: white;
+}
+
+.status-icon-check {
+  font-size: 80px;
+  color: #2ecc71;
+  margin-bottom: 20px;
+  font-weight: bold;
+}
+
+.status-icon {
+  font-size: 80px;
+  margin-bottom: 20px;
+}
+
+.status-title {
+  font-size: 36px;
+  font-weight: 700;
+  color: white;
+  margin: 0 0 16px 0;
+}
+
+.status-message {
+  font-size: 18px;
+  color: #e8eef2;
+  margin: 0 0 30px 0;
+}
+
+.btn-timeout-red {
+  background: #c62828;
+  color: white;
+  border: none;
+  padding: 16px 48px;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 20px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(198, 40, 40, 0.3);
+}
+
+.btn-timeout-red:hover:not(:disabled) {
+  background: #aa2424;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(198, 40, 40, 0.4);
+}
+
+.btn-timeout-red:disabled {
+  background: #666;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.btn-logout-blue {
+  background: #3d5afe;
+  color: white;
+  border: none;
+  padding: 14px 40px;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 18px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(61, 90, 254, 0.3);
+}
+
+.btn-logout-blue:hover {
+  background: #3651e6;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(61, 90, 254, 0.4);
+}
+
+/* Logout Success Page */
+.logout-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #0f2a38 0%, #1a4d63 100%);
+  padding: 20px;
+}
+
+.logout-container {
+  width: 100%;
+  max-width: 600px;
+}
+
+.logout-content {
+  background: #ffffff;
+  border-radius: 24px;
+  padding: 80px 60px;
+  text-align: center;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.logout-logo {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 30px;
+}
+
+.logout-logo svg {
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1));
+}
+
+.logout-title {
+  font-size: 48px;
+  font-weight: 800;
+  color: #102a36;
+  margin: 0 0 8px 0;
+  letter-spacing: -0.5px;
+}
+
+.logout-subtitle {
+  font-size: 16px;
+  color: #5a6c7a;
+  margin: 0 0 40px 0;
+  font-weight: 500;
+}
+
+.logout-message {
+  font-size: 28px;
+  font-weight: 700;
+  color: #2e7d32;
+  margin: 0 0 50px 0;
+}
+
+.btn-login-again {
+  background: #2e7d32;
+  color: #ffffff;
+  font-size: 22px;
+  font-weight: 700;
+  padding: 20px 60px;
+  border: none;
+  border-radius: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 8px 20px rgba(46, 125, 50, 0.3);
+}
+
+.btn-login-again:hover {
+  background: #266a2a;
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px rgba(46, 125, 50, 0.4);
 }
 
 .form-actions {
@@ -247,6 +428,36 @@ textarea.form-field {
   background: #1d4ed8;
 }
 
+.btn-timeout {
+  background: #c62828;
+  color: white;
+  border: none;
+  padding: 16px 48px;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 20px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 20px;
+  box-shadow: 0 8px 16px rgba(198, 40, 40, 0.3);
+}
+
+.btn-timeout:hover:not(:disabled) {
+  background: #aa2424;
+  transform: translateY(-2px);
+  box-shadow: 0 12px 20px rgba(198, 40, 40, 0.4);
+}
+
+.btn-timeout:disabled {
+  background: #666;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.btn-timeout:disabled:hover {
+  transform: none;
+}
+
 /* Responsive design */
 @media (max-width: 768px) {
   .form-content {
@@ -283,4 +494,80 @@ textarea.form-field {
   .btn-timein {
     width: 100%;
   }
+}
+
+/* Logout Confirmation Modal */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(15, 42, 56, 0.95);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.logout-confirm-modal {
+  background: #f5f8fa;
+  border-radius: 20px;
+  padding: 50px 60px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+  text-align: center;
+  max-width: 500px;
+  width: 90%;
+}
+
+.logout-confirm-text {
+  font-size: 24px;
+  color: #102a36;
+  margin-bottom: 40px;
+  font-weight: 500;
+}
+
+.logout-confirm-text strong {
+  font-weight: 700;
+}
+
+.logout-confirm-buttons {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+}
+
+.btn-confirm-yes,
+.btn-confirm-no {
+  font-size: 20px;
+  font-weight: 700;
+  padding: 18px 50px;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  min-width: 120px;
+}
+
+.btn-confirm-yes {
+  background: #2d3e50;
+  color: #fff;
+}
+
+.btn-confirm-yes:hover {
+  background: #1f2d3d;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+}
+
+.btn-confirm-no {
+  background: #6b7b8c;
+  color: #fff;
+}
+
+.btn-confirm-no:hover {
+  background: #5a6879;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
 }

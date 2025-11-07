@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
+import ReCAPTCHA from 'react-google-recaptcha';
 import './Auth.css';
 
 interface AdminLoginProps {
@@ -11,7 +12,9 @@ const AdminLogin: React.FC<AdminLoginProps> = ({ onLogin }) => {
   const [formData, setFormData] = useState({ email: '', password: '' });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
+  const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
+
+  const recaptchaSiteKey = process.env.REACT_APP_RECAPTCHA_SITE_KEY || '';
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -19,16 +22,28 @@ const AdminLogin: React.FC<AdminLoginProps> = ({ onLogin }) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
     setError('');
+
+    if (recaptchaSiteKey && !recaptchaToken) {
+      setError('Please complete the reCAPTCHA challenge.');
+      return;
+    }
+
+    setLoading(true);
     try {
-      const response = await axios.post('/api/auth/login', formData);
+      const response = await axios.post('/api/auth/login', {
+        ...formData,
+        recaptchaToken: recaptchaToken || undefined
+      });
       const { user, token } = response.data;
       if (user.role !== 'admin') {
         setError('Admin access only.');
         return;
       }
       onLogin(user, token);
+      if (recaptchaSiteKey) {
+        setRecaptchaToken(null);
+      }
     } catch (err: any) {
       setError(err.response?.data?.message || 'Login failed');
     } finally {
@@ -56,49 +71,40 @@ const AdminLogin: React.FC<AdminLoginProps> = ({ onLogin }) => {
         <h2 className="login-heading">Admin Login</h2>
         {error && <div className="error-message">{error}</div>}
         <form onSubmit={handleSubmit} className="auth-form">
-          <div className="form-group input-with-icon">
+          <div className="form-group">
             <label htmlFor="email">Email Address</label>
-            <div className="input-wrapper">
-              <span className="left-icon" aria-hidden>
-                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M4 6h16v12H4z" stroke="#0b5161" strokeWidth="1.8"/>
-                  <path d="M4 7l8 6 8-6" stroke="#0b5161" strokeWidth="1.8" fill="none"/>
-                </svg>
-              </span>
-              <input id="email" name="email" type="email" value={formData.email} onChange={handleChange} required disabled={loading} />
-            </div>
+            <input 
+              id="email" 
+              name="email" 
+              type="email" 
+              value={formData.email} 
+              onChange={handleChange} 
+              required 
+              disabled={loading} 
+            />
           </div>
-          <div className="form-group input-with-icon">
+          <div className="form-group">
             <label htmlFor="password">Password</label>
-            <div className="input-wrapper">
-              <span className="left-icon" aria-hidden>
-                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <rect x="5" y="11" width="14" height="9" rx="2" stroke="#0b5161" strokeWidth="1.8"/>
-                  <path d="M8 11V9a4 4 0 1 1 8 0v2" stroke="#0b5161" strokeWidth="1.8"/>
-                </svg>
-              </span>
-              <input id="password" name="password" type={showPassword ? 'text' : 'password'} value={formData.password} onChange={handleChange} required disabled={loading} />
-              <button
-                type="button"
-                className="right-icon toggle-visibility"
-                onClick={() => setShowPassword((s) => !s)}
-                aria-label={showPassword ? 'Hide password' : 'Show password'}
-              >
-                {showPassword ? (
-                  <svg viewBox="0 0 24 24" width="18" height="18" xmlns="http://www.w3.org/2000/svg" fill="none">
-                    <path d="M3 12s3.5-6 9-6 9 6 9 6-3.5 6-9 6-9-6-9-6Z" stroke="#0b5161" strokeWidth="1.8"/>
-                    <circle cx="12" cy="12" r="3" stroke="#0b5161" strokeWidth="1.8"/>
-                    <path d="M4 20L20 4" stroke="#0b5161" strokeWidth="1.6"/>
-                  </svg>
-                ) : (
-                  <svg viewBox="0 0 24 24" width="18" height="18" xmlns="http://www.w3.org/2000/svg" fill="none">
-                    <path d="M3 12s3.5-6 9-6 9 6 9 6-3.5 6-9 6-9-6-9-6Z" stroke="#0b5161" strokeWidth="1.8"/>
-                    <circle cx="12" cy="12" r="3" stroke="#0b5161" strokeWidth="1.8"/>
-                  </svg>
-                )}
-              </button>
-            </div>
+            <input 
+              id="password" 
+              name="password" 
+              type="password" 
+              value={formData.password} 
+              onChange={handleChange} 
+              required 
+              disabled={loading} 
+            />
           </div>
+
+          {recaptchaSiteKey && (
+            <div className="form-group">
+              <ReCAPTCHA
+                sitekey={recaptchaSiteKey}
+                onChange={(token: string | null) => setRecaptchaToken(token)}
+                onExpired={() => setRecaptchaToken(null)}
+              />
+            </div>
+          )}
 
           <button type="submit" className="btn btn-primary figma-login-btn" disabled={loading}>
             {loading ? 'Signing in...' : 'Login'}

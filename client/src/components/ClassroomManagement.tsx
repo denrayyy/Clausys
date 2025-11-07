@@ -7,7 +7,7 @@ interface User {
   firstName: string;
   lastName: string;
   email: string;
-  role: 'teacher' | 'admin';
+  role: 'student' | 'admin' | 'teacher'; // 'teacher' kept for backward compatibility
   employeeId: string;
   department: string;
 }
@@ -152,14 +152,6 @@ const ClassroomManagement: React.FC<ClassroomManagementProps> = ({ user }) => {
       <div className="card">
         <div className="card-header">
           <h2>Classrooms</h2>
-          {user.role === 'admin' && (
-            <button
-              className="btn btn-primary"
-              onClick={() => setShowForm(true)}
-            >
-              Add Classroom
-            </button>
-          )}
         </div>
 
         {showForm && (
@@ -243,65 +235,6 @@ const ClassroomManagement: React.FC<ClassroomManagementProps> = ({ user }) => {
             </div>
           </form>
         )}
-
-        <div className="classroom-grid">
-          {classrooms.length === 0 ? (
-            <div className="no-classrooms">
-              <p>No classrooms found. {user.role === 'admin' && 'Add a classroom to get started.'}</p>
-            </div>
-          ) : (
-            classrooms.map(classroom => (
-              <div key={classroom._id} className="classroom-card">
-                <div className="classroom-header">
-                  <h3>{classroom.name}</h3>
-                  <span className={`status-badge ${classroom.isAvailable ? 'status-approved' : 'status-rejected'}`}>
-                    {classroom.isAvailable ? 'Available' : 'Unavailable'}
-                  </span>
-                </div>
-                
-                <div className="classroom-details">
-                  <div className="detail-item">
-                    <span className="detail-label">Location:</span>
-                    <span className="detail-value">{classroom.location}</span>
-                  </div>
-                  <div className="detail-item">
-                    <span className="detail-label">Capacity:</span>
-                    <span className="detail-value">{classroom.capacity} students</span>
-                  </div>
-                  {classroom.equipment.length > 0 && (
-                    <div className="detail-item">
-                      <span className="detail-label">Equipment:</span>
-                      <span className="detail-value">{classroom.equipment.join(', ')}</span>
-                    </div>
-                  )}
-                  {classroom.description && (
-                    <div className="detail-item">
-                      <span className="detail-label">Description:</span>
-                      <span className="detail-value">{classroom.description}</span>
-                    </div>
-                  )}
-                </div>
-
-                {user.role === 'admin' && (
-                  <div className="classroom-actions">
-                    <button
-                      className="btn btn-outline"
-                      onClick={() => handleEdit(classroom)}
-                    >
-                      Edit
-                    </button>
-                    <button
-                      className="btn btn-danger"
-                      onClick={() => handleDelete(classroom._id)}
-                    >
-                      Delete
-                    </button>
-                  </div>
-                )}
-              </div>
-            ))
-          )}
-        </div>
       </div>
     </div>
   );

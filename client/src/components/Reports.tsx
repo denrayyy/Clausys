@@ -7,7 +7,7 @@ interface User {
   firstName: string;
   lastName: string;
   email: string;
-  role: 'teacher' | 'admin';
+  role: 'student' | 'admin' | 'teacher'; // 'teacher' kept for backward compatibility
   employeeId: string;
   department: string;
 }
@@ -35,8 +35,6 @@ const Reports: React.FC<ReportsProps> = ({ user }) => {
   return (
     <div className="reports">
       <div className="page-header">
-        <h1>Reports</h1>
-        <p>Generate and view utilization reports</p>
       </div>
 
       <div className="card">

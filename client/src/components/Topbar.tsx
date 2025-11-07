@@ -1,12 +1,14 @@
 import React from 'react';
-import './AdminDashboard.css';
+import './Topbar.css';
 
 interface TopbarProps {
   fullName: string;
   onLogout: () => void;
+  onProfileClick?: () => void;
+  profilePhoto?: string;
 }
 
-const Topbar: React.FC<TopbarProps> = ({ fullName }) => {
+const Topbar: React.FC<TopbarProps> = ({ fullName, onProfileClick, profilePhoto }) => {
 
   return (
     <header className="admin-header" style={{ position: 'relative' }}>
@@ -23,13 +25,17 @@ const Topbar: React.FC<TopbarProps> = ({ fullName }) => {
           <div className="subtitle">Classroom Utilization System</div>
         </div>
       </div>
-      <div className="user">
+      <div className="user" onClick={onProfileClick} style={{ cursor: onProfileClick ? 'pointer' : 'default' }}>
         <span className="name">{fullName}</span>
         <div className="avatar" aria-label="Profile">
-          <svg viewBox="0 0 24 24" width="24" height="24" xmlns="http://www.w3.org/2000/svg" fill="none">
-            <circle cx="12" cy="8" r="3.5" stroke="#102a36" strokeWidth="1.8"/>
-            <path d="M4 20c1.8-4 5-6 8-6s6.2 2 8 6" stroke="#102a36" strokeWidth="1.8" strokeLinecap="round"/>
-          </svg>
+          {profilePhoto ? (
+            <img src={profilePhoto} alt="Profile" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
+          ) : (
+            <svg viewBox="0 0 24 24" width="24" height="24" xmlns="http://www.w3.org/2000/svg" fill="none">
+              <circle cx="12" cy="8" r="3.5" stroke="#102a36" strokeWidth="1.8"/>
+              <path d="M4 20c1.8-4 5-6 8-6s6.2 2 8 6" stroke="#102a36" strokeWidth="1.8" strokeLinecap="round"/>
+            </svg>
+          )}
         </div>
       </div>
     </header>

@@ -2,7 +2,7 @@ import express from "express";
 import Schedule from "../models/Schedule.js";
 import Classroom from "../models/Classroom.js";
 import { body, validationResult } from "express-validator";
-import { authenticateToken, requireAdmin, requireTeacher } from "../middleware/auth.js";
+import { authenticateToken, requireAdmin, requireStudent } from "../middleware/auth.js";
 
 const router = express.Router();
 
@@ -11,21 +11,21 @@ const router = express.Router();
 // @access  Private
 router.get("/", authenticateToken, async (req, res) => {
   try {
-    const { teacher, status, semester, academicYear } = req.query;
+    const { student, status, semester, academicYear } = req.query;
     let query = {};
 
-    // If user is teacher, only show their schedules
-    if (req.user.role === "teacher") {
-      query.teacher = req.user._id;
+    // If user is student or teacher, only show their schedules
+    if (req.user.role === "student" || req.user.role === "teacher") {
+      query.student = req.user._id;
     }
 
-    if (teacher) query.teacher = teacher;
+    if (student) query.student = student;
     if (status) query.status = status;
     if (semester) query.semester = semester;
     if (academicYear) query.academicYear = academicYear;
 
     const schedules = await Schedule.find(query)
-      .populate("teacher", "firstName lastName email employeeId department")
+      .populate("student", "firstName lastName email employeeId department")
       .populate("classroom", "name location capacity")
       .populate("approvedBy", "firstName lastName")
       .sort({ dayOfWeek: 1, startTime: 1 });
@@ -43,7 +43,7 @@ router.get("/", authenticateToken, async (req, res) => {
 router.get("/:id", authenticateToken, async (req, res) => {
   try {
     const schedule = await Schedule.findById(req.params.id)
-      .populate("teacher", "firstName lastName email employeeId department")
+      .populate("student", "firstName lastName email employeeId department")
       .populate("classroom", "name location capacity")
       .populate("approvedBy", "firstName lastName");
 
@@ -51,8 +51,8 @@ router.get("/:id", authenticateToken, async (req, res) => {
       return res.status(404).json({ message: "Schedule not found" });
     }
 
-    // Teachers can only view their own schedules
-    if (req.user.role === "teacher" && schedule.teacher._id.toString() !== req.user._id.toString()) {
+    // Students can only view their own schedules
+    if ((req.user.role === "student" || req.user.role === "teacher") && schedule.student._id.toString() !== req.user._id.toString()) {
       return res.status(403).json({ message: "Access denied" });
     }
 
@@ -65,8 +65,8 @@ router.get("/:id", authenticateToken, async (req, res) => {
 
 // @route   POST /api/schedules
 // @desc    Create a new schedule request
-// @access  Private (Teacher)
-router.post("/", authenticateToken, requireTeacher, [
+// @access  Private (Student)
+router.post("/", authenticateToken, requireStudent, [
   body("classroom").isMongoId().withMessage("Valid classroom ID is required"),
   body("subject").notEmpty().withMessage("Subject is required"),
   body("courseCode").notEmpty().withMessage("Course code is required"),
@@ -123,7 +123,7 @@ router.post("/", authenticateToken, requireTeacher, [
     }
 
     const schedule = new Schedule({
-      teacher: req.user._id,
+      student: req.user._id,
       classroom,
       subject,
       courseCode,
@@ -174,7 +174,7 @@ router.put("/:id/approve", authenticateToken, requireAdmin, [
     }
 
     await schedule.save();
-    await schedule.populate("teacher", "firstName lastName email employeeId department");
+    await schedule.populate("student", "firstName lastName email employeeId department");
     await schedule.populate("classroom", "name location capacity");
     await schedule.populate("approvedBy", "firstName lastName");
 
@@ -215,7 +215,7 @@ router.put("/:id/reject", authenticateToken, requireAdmin, [
     schedule.notes = req.body.notes;
 
     await schedule.save();
-    await schedule.populate("teacher", "firstName lastName email employeeId department");
+    await schedule.populate("student", "firstName lastName email employeeId department");
     await schedule.populate("classroom", "name location capacity");
     await schedule.populate("approvedBy", "firstName lastName");
 
@@ -239,8 +239,8 @@ router.put("/:id", authenticateToken, async (req, res) => {
       return res.status(404).json({ message: "Schedule not found" });
     }
 
-    // Teachers can only update their own schedules
-    if (req.user.role === "teacher" && schedule.teacher.toString() !== req.user._id.toString()) {
+    // Students can only update their own schedules
+    if ((req.user.role === "student" || req.user.role === "teacher") && schedule.student.toString() !== req.user._id.toString()) {
       return res.status(403).json({ message: "Access denied" });
     }
 
@@ -262,7 +262,7 @@ router.put("/:id", authenticateToken, async (req, res) => {
       req.params.id,
       updates,
       { new: true, runValidators: true }
-    ).populate("teacher", "firstName lastName email employeeId department")
+    ).populate("student", "firstName lastName email employeeId department")
      .populate("classroom", "name location capacity");
 
     res.json({
@@ -285,8 +285,8 @@ router.delete("/:id", authenticateToken, async (req, res) => {
       return res.status(404).json({ message: "Schedule not found" });
     }
 
-    // Teachers can only delete their own schedules
-    if (req.user.role === "teacher" && schedule.teacher.toString() !== req.user._id.toString()) {
+    // Students can only delete their own schedules
+    if ((req.user.role === "student" || req.user.role === "teacher") && schedule.student.toString() !== req.user._id.toString()) {
       return res.status(403).json({ message: "Access denied" });
     }
 

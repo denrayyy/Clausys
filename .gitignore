@@ -1,0 +1,53 @@
+# .gitignore
+# Purpose: Prevent sensitive files, build artifacts, logs, and system/IDE noise from being committed.
+# Why: Keeps the repository clean, reduces merge conflicts, and protects secrets.
+
+# --- Dependencies ---
+node_modules/
+
+# --- Environment variables (NEVER commit real secrets) ---
+.env
+
+# --- Logs ---
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# --- Build outputs / caches ---
+dist/
+build/
+.cache/
+.parcel-cache/
+.next/
+.nuxt/
+.vite/
+coverage/
+storybook-static/
+cache/
+out/
+
+# --- Temporary files ---
+tmp/
+temp/
+
+# --- OS files ---
+.DS_Store
+Thumbs.db
+
+# --- IDE/editor settings ---
+.idea/
+.vscode/
+*.swp
+*.swo
+*.iml
+
+# --- Misc ---
+*.local
+*.env.*.local
+coverage/
+test-results/
+
+

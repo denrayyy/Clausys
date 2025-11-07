@@ -24,7 +24,25 @@ const classroomSchema = mongoose.Schema({
   },
   description: {
     type: String
-  }
+  },
+  schedules: [{
+    day: {
+      type: String,
+      enum: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+    },
+    time: {
+      type: String
+    },
+    section: {
+      type: String
+    },
+    subjectCode: {
+      type: String
+    },
+    instructor: {
+      type: String
+    }
+  }]
 }, {
   timestamps: true
 });
